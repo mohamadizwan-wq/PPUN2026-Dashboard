@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Projek PPUN - MOTAC</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    :root {
+      --primary: #17365D; /* Corporate Navy Blue */
+      --accent: #D4AF37;  /* Corporate Gold */
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); padding: 20px; line-height: 1.6; }
+    
+    .container { max-width: 1400px; margin: 0 auto; }
+    
+    /* Header Styles */
+    .header {
+      background: var(--primary);
+      color: white;
+      padding: 24px 32px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border-bottom: 4px solid var(--accent);
+    }
+    .header-title h1 { font-size: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .header-title p { color: #CBD5E1; font-size: 0.9rem; margin-top: 4px; }
+    
+    /* Stats Cards */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border-left: 4px solid var(--primary);
+    }
+    .stat-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-top: 8px; }
+
+    /* Controls */
+    .controls { display: flex; gap: 12px; margin-bottom: 20px; }
+    .search-box {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+    .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(23, 54, 93, 0.1); }
+    .btn-refresh {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-refresh:hover { background: #BFA030; }
+
+    /* Table Styles */
+    .table-container {
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      background: #F1F5F9;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      padding: 16px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 0.9rem; vertical-align: top; }
+    tr:hover { background-color: #F8FAFC; }
+    
+    /* Elements */
+    .proj-title { font-weight: 700; color: var(--primary); font-size: 1rem; margin-bottom: 4px; }
+    .proj-agency { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    .skop-kerja { font-size: 0.85rem; color: #475569; margin-top: 8px; white-space: pre-line; max-height: 100px; overflow-y: auto; background: #F8FAFC; padding: 8px; border-radius: 6px; }
+    
+    .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-block; }
+    .badge-siap { background: #DCFCE7; color: #166534; }
+    .badge-proses { background: #FEF9C3; color: #854D0E; }
+    .badge-lewat { background: #FEE2E2; color: #991B1B; }
+    .badge-default { background: #F1F5F9; color: #475569; }
+
+    /* Progress Bar */
+    .progress-wrapper { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .progress-bg { flex: 1; background: #E2E8F0; border-radius: 10px; height: 8px; overflow: hidden; }
+    .progress-fill { background: var(--primary); height: 100%; border-radius: 10px; transition: width 0.5s ease-in-out; }
+    .progress-text { font-size: 0.85rem; font-weight: 700; min-width: 40px; }
+
+    /* Image Thumbnail */
+    .img-thumbnail {
+      width: 100px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .img-thumbnail:hover { transform: scale(1.05); }
+    .no-img {
+      width: 100px; height: 70px; background: #F1F5F9; color: #94A3B8;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px; font-size: 0.75rem; text-align: center; border: 1px dashed #CBD5E1;
+    }
+    
+    .loading-state { padding: 40px; text-align: center; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-title">
+        <h1>Dashboard Pemantauan Projek PPUN</h1>
+        <p id="last-updated">Memuatkan data secara langsung...</p>
+      </div>
+      <button class="btn-refresh" onclick="muatData()">Segarkan Data</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-container" id="stats-bar">
+      <!-- Data akan masuk dari JS -->
+    </div>
+
+    <!-- Search -->
+    <div class="controls">
+      <input type="text" id="search" class="search-box" placeholder="Cari nama projek, agensi, kontraktor atau status..." onkeyup="tapisJadual()">
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <div id="table-content" class="loading-state">
+        Sedang menarik data dari Google Sheet...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. MASUKKAN LINK CSV GOOGLE SHEET ANDA DI SINI
+    // =========================================================================
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQZ6tx2sYh-Qo6_oTTjj4cmPqi4ID3v_wQSqGumh5rLekMCe25IwRkEXEb9LS0hB1B9zRW0RcSaG84W/pubhtml?gid=0&single=true";
+    
+    let globalData = [];
+
+    async function muatData() {
+      const container = document.getElementById("table-content");
+      
+      if (!SHEET_CSV_URL || SHEET_CSV_URL === "LETAK_LINK_CSV_DI_SINI") {
+        container.innerHTML = "<b>Peringatan:</b> Sila masukkan link CSV Google Sheet pada bahagian kod 'SHEET_CSV_URL' terlebih dahulu.";
+        return;
+      }
+
+      try {
+        const separator = SHEET_CSV_URL.includes("?") ? "&" : "?";
+        const res = await fetch(SHEET_CSV_URL + separator + "t=" + Date.now());
+        if (!res.ok) throw new Error("Gagal akses CSV");
+        const csvText = await res.text();
+        
+        const rawRows = parseCSV(csvText);
+        if (rawRows.length < 2) {
+          container.innerHTML = "Tiada data projek dijumpai.";
+          return;
+        }
+
+        // Map data ikut tajuk kolum
+        const headers = rawRows[0].map(h => h.trim());
+        globalData = rawRows.slice(1).filter(r => r.length > 1 && r[0].trim() !== "").map(r => {
+          let obj = {};
+          headers.forEach((h, i) => { obj[h] = r[i] ? r[i].trim() : ""; });
+          return obj;
+        });
+
+        kiraStatistik(globalData);
+        binaJadual(globalData);
+        
+        const masa = new Date().toLocaleTimeString("ms-MY", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        document.getElementById("last-updated").innerText = "Data Terkini: " + masa + " (Auto-kemaskini)";
+      } catch (err) {
+        container.innerHTML = "Ralat memuat turun data. Sila pastikan Sheet telah di-Publish sebagai CSV.";
+        console.error(err);
+      }
+    }
+
+    function kiraStatistik(data) {
+      let siap = 0, proses = 0, total = data.length;
+      data.forEach(d => {
+        const status = (d['Status Semasa'] || "").toLowerCase();
+        if (status.includes("siap") || status.includes("selesai")) siap++;
+        else if (status.includes("proses") || status.includes("progress") || status.includes("laksana")) proses++;
+      });
+
+      document.getElementById("stats-bar").innerHTML = `
+        <div class="stat-card">
+          <div class="stat-title">Jumlah Projek</div>
+          <div class="stat-value">${total}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Dalam Pelaksanaan</div>
+          <div class="stat-value" style="color: #B45309">${proses}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Telah Siap</div>
+          <div class="stat-value" style="color: #15803D">${siap}</div>
+        </div>
+      `;
+    }
+
+    // Fungsi tukar Google Drive URL jadi Thumbnail
+    function prosesGambar(url) {
+      if (!url) return `<div class="no-img">Tiada<br>Gambar</div>`;
+      
+      // Semak kalau ia link Google Drive
+      let match = url.match(/\\/d\\/([a-zA-Z0-9_-]+)/);
+      if (match && match[1]) {
+        let fileId = match[1];
+        let directUrl = \`https://drive.google.com/uc?export=view&id=\${fileId}\`;
+        return \`<img src="\${directUrl}" class="img-thumbnail" alt="Gambar" title="Klik untuk besarkan" onclick="window.open('\${url}', '_blank')">\`;
+      }
+      return \`<a href="\${url}" target="_blank" style="font-size:0.85rem;">Lihat Fail</a>\`;
+    }
+
+    function formatStatus(status) {
+      if (!status) return "-";
+      let s = status.toLowerCase();
+      if (s.includes("siap") || s.includes("selesai")) return \`<span class="badge badge-siap">\${status}</span>\`;
+      if (s.includes("proses") || s.includes("laksana") || s.includes("progress")) return \`<span class="badge badge-proses">\${status}</span>\`;
+      if (s.includes("lewat") || s.includes("tangguh") || s.includes("batal")) return \`<span class="badge badge-lewat">\${status}</span>\`;
+      return \`<span class="badge badge-default">\${status}</span>\`;
+    }
+
+    function formatProgress(peratusText) {
+      if (!peratusText) return "-";
+      let nilai = parseFloat(peratusText.replace(/[^0-9.]/g, ''));
+      if (isNaN(nilai)) nilai = 0;
+      if (nilai > 100) nilai = 100;
+      
+      return \`
+        <div class="progress-wrapper" title="\${nilai}%">
+          <div class="progress-bg"><div class="progress-fill" style="width: \${nilai}%"></div></div>
+          <div class="progress-text">\
